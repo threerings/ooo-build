@@ -1,0 +1,339 @@
+<project name="ooo-macros" xmlns:artifact="urn:maven-artifact-ant">
+  <macrodef name="ooojavac" description="Calls javac with Three Rings' standard arguments">
+    <attribute name="srcdir"/>
+    <attribute name="destdir"/>
+    <attribute name="classpathref"/>
+    <attribute name="version" default="1.6"/>
+    <element name="javac-elements" implicit="true" optional="true"/>
+    <sequential>
+        <javac srcdir="@{srcdir}" destdir="@{destdir}" includeAntRuntime="no" encoding="utf-8"
+            classpathref="@{classpathref}" debug="on" optimize="off" deprecation="on"
+            source="@{version}" target="@{version}">
+          <compilerarg value="-Xlint"/>
+          <compilerarg value="-Xlint:-serial"/>
+          <compilerarg value="-Xlint:-path"/>
+          <javac-elements/>
+      </javac>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="requireflex"
+      description="Fails unless it can find the flexsdk or unless flexsdk.dir is already set">
+      <attribute name="version" default="4"/>
+      <sequential>
+          <!-- Set the full flex version from the major version passed in if flex.version isn't
+               already set.  -->
+          <if>
+              <equals arg1="@{version}" arg2="4"/>
+              <then><property name="flex.version" value="4.1.0.16076"/></then>
+              <else><property name="flex.version" value="3.3.0.4852"/></else>
+          </if>
+          <if>
+              <not><matches string="${flex.version}" pattern="^@{version}"/></not>
+              <then><fail message="A flex task required flex major version @{version} but ${flex.version} is the set version"/></then>
+          </if>
+
+          <if>
+            <not><isset property="flexsdk.dir"/></not>
+            <then>
+              <!-- locate our flex sdk -->
+              <condition property="flexsdk.prop" value="${env.FLEX_HOME}">
+                <available file="${env.FLEX_HOME}/lib/compc.jar"/>
+              </condition>
+              <condition property="flexsdk.prop" value="../flex/flex_sdk_${flex.version}">
+                <available file="../flex/flex_sdk_${flex.version}/lib/compc.jar"/>
+              </condition>
+              <condition property="flexsdk.prop" value="../OOOLIBS-FLEX/flex_sdk_${flex.version}">
+                <available file="../OOOLIBS-FLEX/flex_sdk_${flex.version}/lib/compc.jar"/>
+              </condition>
+              <dirname property="parent.dir" file="../somefile.txt"/>
+              <fail><condition><not><isset property="flexsdk.prop"/></not></condition>
+                You must either pass -Dflexsdk.dir=somedir on the command line, define a
+                FLEX_HOME environment variable, or make the Flex SDK available as
+                ${parent.dir}/flex/flex_sdk_${flex.version}
+              </fail>
+              <!-- Absolutize the found directory into flexsdk.dir -->
+              <property name="flexsdk.dir" location="${flexsdk.prop}"/>
+            </then>
+          </if>
+      </sequential>
+  </macrodef>
+
+  <macrodef name="amxmlc4">
+    <attribute name="srcdir"/>
+    <attribute name="dest"/>
+    <attribute name="main"/>
+    <attribute name="libpath" default=","/>
+    <attribute name="stacktraces" default="true"/>
+    <attribute name="static-lrsl" default="false"/>
+    <attribute name="use-network" default="false"/>
+    <attribute name="debug" default="true"/>
+    <element name="xargs" implicit="true" optional="true"/>
+
+    <sequential>
+      <requireflex version="4"/>
+      <if><equals arg1="${useng}" arg2="true"/><then>
+          <echo file="dist/ng">
+ng flex2.tools.Mxmlc \
+  -static-link-runtime-shared-libraries=@{static-lrsl} \
+  +flexlib=${flexsdk.dir}/frameworks \
+  +configname=air \
+  -verbose-stacktraces=@{stacktraces} \
+  -use-network=@{use-network} \
+  -compiler.library-path+=${flexsdk.dir}/frameworks/libs/air/aircore.swc \
+  -compiler.library-path+=${flexsdk.dir}/frameworks/libs/air/airglobal.swc \
+  -compiler.library-path+=@{libpath} \
+  -compiler.debug=@{debug} \
+  -compiler.accessible=false \
+  -compiler.incremental=false \
+  -compiler.omit-trace-statements=false \
+  -source-path+=@{srcdir} \
+  -output=@{dest} \
+  @{srcdir}/@{main}
+          </echo>
+        </then><else>
+          <java jar="${flexsdk.dir}/lib/mxmlc.jar" fork="true" failonerror="true" maxmemory="1024m">
+            <jvmarg value="-Djava.awt.headless=true"/>
+            <xargs/>
+            <arg value="-static-link-runtime-shared-libraries=@{static-lrsl}"/>
+            <arg value="+flexlib=${flexsdk.dir}/frameworks"/>
+            <arg value="+configname=air"/>
+            <arg value="-verbose-stacktraces=@{stacktraces}"/>
+            <arg value="-use-network=@{use-network}"/>
+            <arg value="-compiler.library-path+=@{libpath}"/>
+            <arg value="-compiler.debug=@{debug}"/>
+            <arg value="-compiler.accessible=false"/>
+            <arg value="-compiler.incremental=false"/>
+            <arg value="-compiler.omit-trace-statements=false"/>
+            <arg value="-source-path+=@{srcdir}"/>
+            <arg value="-output=@{dest}"/>
+            <arg value="@{srcdir}/@{main}"/>
+          </java>
+        </else></if>
+    </sequential>
+  </macrodef>
+  <macrodef name="mxmlc4">
+      <attribute name="srcdir"/>
+      <attribute name="dest"/>
+      <attribute name="main"/>
+      <attribute name="libpath" default=","/>
+      <attribute name="stacktraces" default="true"/>
+      <attribute name="static-lrsl" default="false"/>
+      <attribute name="use-network" default="false"/>
+      <attribute name="debug" default="true"/>
+      <element name="xargs" implicit="true" optional="true"/>
+
+      <sequential>
+          <requireflex version="4"/>
+          <if><equals arg1="${useng}" arg2="true"/><then>
+                  <echo file="dist/ng">
+ng flex2.tools.Mxmlc \
+  -static-link-runtime-shared-libraries=@{static-lrsl} \
+  +flexlib=${flexsdk.dir}/frameworks \
+  -verbose-stacktraces=@{stacktraces} \
+  -use-network=@{use-network} \
+  -compiler.library-path+=@{libpath} \
+  -compiler.debug=@{debug} \
+  -compiler.accessible=false \
+  -compiler.incremental=false \
+  -compiler.omit-trace-statements=false \
+  -source-path+=@{srcdir} \
+  -output=@{dest} \
+  @{srcdir}/@{main}
+                  </echo>
+                  </then><else>
+                  <java jar="${flexsdk.dir}/lib/mxmlc.jar" fork="true" failonerror="true" maxmemory="1024m">
+                      <jvmarg value="-Djava.awt.headless=true"/>
+                      <xargs/>
+                      <arg value="-static-link-runtime-shared-libraries=@{static-lrsl}"/>
+                      <arg value="+flexlib=${flexsdk.dir}/frameworks"/>
+                      <arg value="-verbose-stacktraces=@{stacktraces}"/>
+                      <arg value="-use-network=@{use-network}"/>
+                      <arg value="-compiler.library-path+=@{libpath}"/>
+                      <arg value="-compiler.debug=@{debug}"/>
+                      <arg value="-compiler.accessible=false"/>
+                      <arg value="-compiler.incremental=false"/>
+                      <arg value="-compiler.omit-trace-statements=false"/>
+                      <arg value="-source-path+=@{srcdir}"/>
+                      <arg value="-output=@{dest}"/>
+                      <arg value="@{srcdir}/@{main}"/>
+                  </java>
+          </else></if>
+      </sequential>
+  </macrodef>
+
+    <!-- Runs compc with Three Rings' default configuration.  If useng is set, nailgun is called
+instead of the compc jar-->
+    <macrodef name="compc4">
+        <attribute name="srcdir"/>
+        <attribute name="dest"/>
+        <attribute name="libpath" default=","/>
+        <attribute name="debug" default="true"/>
+        <element name="xargs" implicit="true" optional="true"/>
+
+        <sequential>
+            <requireflex version="4"/>
+            <if><equals arg1="${useng}" arg2="true"/><then>
+                    <echo file="dist/ng">
+ng flex2.tools.Compc \
+  +flexlib=${flexsdk.dir}/frameworks \
+  -compiler.external-library-path+=@{libpath} \
+  -compiler.source-path=@{srcdir} \
+  -compiler.debug=@{debug} \
+  -compiler.accessible=false \
+  -compiler.omit-trace-statements=false \
+  -include-sources=@{srcdir} \
+  -output=@{dest}
+                    </echo>
+                    </then><else>
+                    <java jar="${flexsdk.dir}/lib/compc.jar" fork="true" failonerror="true" maxmemory="1024m">
+                        <jvmarg value="-Djava.awt.headless=true"/>
+                        <xargs/>
+                        <arg value="+flexlib=${flexsdk.dir}/frameworks"/>
+                        <arg value="-compiler.external-library-path+=@{libpath}"/>
+                        <arg value="-compiler.source-path=@{srcdir}"/>
+                        <arg value="-compiler.debug=@{debug}"/>
+                        <arg value="-compiler.accessible=false"/>
+                        <arg value="-compiler.omit-trace-statements=false"/>
+                        <arg value="-include-sources=@{srcdir}"/>
+                        <arg value="-output=@{dest}"/>
+                    </java>
+            </else></if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="asimports">
+      <attribute name="srcdir" default="src/main/as" />
+      <sequential>
+        <mavendep id="asimports">
+          <remoteRepository refid="ooo.maven.depends.repo"/>
+          <dependency groupId="com.threerings.aspirin" artifactId="import_action" version="1.7-SNAPSHOT" type="py"/>
+        </mavendep>
+        <exec executable="python">
+          <arg value="${com.threerings.aspirin:import_action:py}" />
+          <arg value="@{srcdir}" />
+        </exec>
+      </sequential>
+    </macrodef>
+
+    <macrodef name="checkpomoridset">
+      <attribute name="id"/>
+      <sequential>
+        <if>
+          <equals arg1="@{id}" arg2=""/>
+          <then>
+            <fail message="Either id or pom must be set"/>
+          </then>
+        </if>
+      </sequential>
+    </macrodef>
+
+    <macrodef name="mavendep"
+      description="Fetches maven dependencies for an id and caches the dependency resolution">
+      <attribute name="pom" default=""/>
+      <attribute name="id" default="@{pom}"/>
+      <attribute name="fileset" default="@{id}.fileset"/>
+      <attribute name="path" default="@{id}.path"/>
+      <attribute name="dependencyFile" default="${deploy.dir}/@{id}.dependencies"/>
+      <attribute name="pathProp" default=""/>
+      <attribute name="pathSep" default=","/>
+      <attribute name="destdir" default=""/>
+      <attribute name="scope" default="runtime"/>
+      <element name="dependencies-elements" implicit="true" optional="true"/>
+      <sequential>
+        <checkpomoridset id="@{id}"/>
+        <if>
+          <matches string="@{dependencyFile}" pattern="^\$\{"/>
+          <then>
+            <fail message="dependencyFile must be set on mavendep if ${deploy.dir} isn't set"/>
+          </then>
+        </if>
+        <if>
+          <not><equals arg1="@{pom}" arg2=""/></not>
+          <then>
+            <artifact:dependencies filesetId="@{fileset}" pathId="@{path}" useScope="@{scope}"
+              cacheDependencyRefs="true" dependencyRefsBuildFile="@{dependencyFile}">
+              <pom file="@{pom}"/>
+              <dependencies-elements/>
+            </artifact:dependencies>
+          </then>
+          <else>
+            <artifact:dependencies filesetId="@{fileset}" pathId="@{path}" useScope="@{scope}"
+              cacheDependencyRefs="true" dependencyRefsBuildFile="@{dependencyFile}">
+              <dependencies-elements/>
+            </artifact:dependencies>
+          </else>
+        </if>
+        <if>
+          <not><equals arg1="@{pathProp}" arg2=""/></not>
+          <then><pathconvert pathsep="," property="@{pathProp}" refid="@{fileset}"/></then>
+        </if>
+        <if>
+          <not><equals arg1="@{destDir}" arg2=""/></not>
+          <then>
+            <copy todir="@{destDir}">
+              <fileset refid="@{fileset}"/>
+              <chainedmapper>
+                <mapper type="flatten"/>
+                <!-- Strip the version off.  Maven versions look like this:
+                     <MajorVersion>[.<MinorVersion>[.<IncrementalVersion>]][-<BuildNumber|Qualifier>]
+                     The first regexp removes the dash qualifier if it exists -->
+                <mapper type="regexp" from="(.+?)(-\w+)?\.(\w+?)$" to="\1.\3"/>
+                <!-- And this regexp gets the version numbers -->
+                <mapper type="regexp" from="(.+?)(-\d.*)?\.(\w+?)$" to="\1.\3"/>
+              </chainedmapper>
+            </copy>
+          </then>
+        </if>
+      </sequential>
+    </macrodef>
+
+    <macrodef name="cleanmavendepcache">
+      <attribute name="pom" default=""/>
+      <attribute name="id" default="@{pom}"/>
+      <attribute name="dependencyFile" default="${deploy.dir}/@{id}.dependencies"/>
+      <sequential>
+        <checkpomoridset id="@{id}"/>
+        <delete file="@{dependencyFile}"/>
+      </sequential>
+    </macrodef>
+
+    <macrodef name="mavendeploy">
+      <attribute name="pom"/>
+      <attribute name="file"/>
+      <attribute name="srcdir" default=""/>
+      <sequential>
+        <if>
+          <isset property="maven.deploy.repo"/>
+          <then>
+            <!-- We've got a loc, so we need to deploy. If srcdir is set, jar up the source and
+              include it in the deployment. Otherwise just deploy the artifact. -->
+            <if>
+              <not><equals arg1="@{srcdir}" arg2=""/></not>
+              <then>
+                <tempfile property="@{srcdir}.jar" prefix="source" suffix=".jar" deleteonexit="true"/>
+                <jar basedir="@{srcdir}" destfile="${@{srcdir}.jar}"/>
+                <artifact:deploy file="@{file}" uniqueVersion="false">
+                  <remoteRepository url="${maven.deploy.repo}"/>
+                  <pom file="@{pom}"/>
+                  <attach file="${@{srcdir}.jar}" classifier="sources"/>
+                </artifact:deploy>
+              </then>
+              <else>
+                <artifact:deploy file="@{file}" uniqueVersion="false">
+                  <remoteRepository url="${maven.deploy.repo}"/>
+                  <pom file="@{pom}"/>
+                </artifact:deploy>
+              </else>
+            </if>
+          </then>
+          <else>
+            <!-- No loc specified, so install it in the local repo and don't worry about source -->
+            <artifact:install file="@{file}">
+              <pom file="@{pom}"/>
+            </artifact:install>
+          </else>
+        </if>
+      </sequential>
+    </macrodef>
+</project>

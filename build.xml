@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<project name="ooo-build" default="dist" basedir="." xmlns:artifact="urn:maven-artifact-ant">
+  <property name="deploy.dir"  value="dist"/>
+
+  <!-- bring in our standard build support -->
+  <property name="ooo-build.vers" value="2.0"/>
+  <ant antfile="etc/bootstrap.xml"/>
+  <import file="${user.home}/.m2/ooo-build/${ooo-build.vers}/build-support.xml"/>
+
+  <target name="distclean">
+    <delete dir="${deploy.dir}"/>
+  </target>
+
+  <target name="dist">
+    <mkdir dir="${deploy.dir}"/>
+    <jar destfile="${deploy.dir}/${ant.project.name}.jar">
+      <fileset dir="src/main/ant" includes="**"/>
+    </jar>
+  </target>
+
+  <target name="maven-deploy" depends="dist,-init-maven-ant,-init-contrib"
+          description="Deploys our build artifacts to a Maven repository.">
+    <mavendeploy file="${deploy.dir}/${ant.project.name}.jar" pom="pom.xml"/>
+  </target>
+</project>
