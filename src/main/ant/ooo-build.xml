@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <project name="build-support" xmlns:artifact="urn:maven-artifact-ant">
   <!-- import our basic macros -->
-  <import file="ooo-macros.xml"/>
+  <import file="ooo-maven-macros.xml"/>
+  <import file="ooo-as-macros.xml"/>
+  <import file="ooo-java-macros.xml"/>
 
   <!-- initializes the Maven Ant tasks -->
   <property name="maven-ant.vers" value="2.1.1"/>

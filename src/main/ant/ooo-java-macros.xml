@@ -1,0 +1,19 @@
+<project name="ooo-java-macros" xmlns:artifact="urn:maven-artifact-ant">
+  <macrodef name="ooojavac" description="Calls javac with Three Rings' standard arguments">
+    <attribute name="srcdir"/>
+    <attribute name="destdir"/>
+    <attribute name="classpathref"/>
+    <attribute name="version" default="1.6"/>
+    <element name="javac-elements" implicit="true" optional="true"/>
+    <sequential>
+      <javac srcdir="@{srcdir}" destdir="@{destdir}" includeAntRuntime="no" encoding="utf-8"
+          classpathref="@{classpathref}" debug="on" optimize="off" deprecation="on"
+          source="@{version}" target="@{version}">
+        <compilerarg value="-Xlint"/>
+        <compilerarg value="-Xlint:-serial"/>
+        <compilerarg value="-Xlint:-path"/>
+        <javac-elements/>
+      </javac>
+    </sequential>
+  </macrodef>
+</project>
