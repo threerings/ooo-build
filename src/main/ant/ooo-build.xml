@@ -31,4 +31,15 @@
     </artifact:dependencies>
     <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="ant-contrib.classpath"/>
   </target>
+
+  <target name="-init-javanailgun" depends="-init-maven-ant" unless="javanailgun.initted">
+    <property name="javanailgun.initted" value="true"/>
+    <artifact:dependencies pathId="javanailgun.classpath">
+      <dependency groupId="com.threerings.ant" artifactId="javanailgun" version="1.0"/>
+    </artifact:dependencies>
+    <taskdef name="javanailgun" classname="com.threerings.ant.JavaNailgunTask"
+      classpathref="javanailgun.classpath"/>
+  </target>
+
+  <target name="-init-as" depends="-init-contrib,-init-javanailgun"/>
 </project>

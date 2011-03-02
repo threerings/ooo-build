@@ -149,38 +149,27 @@ instead of the compc jar-->
     <macrodef name="compc4">
         <attribute name="srcdir"/>
         <attribute name="dest"/>
+        <attribute name="id" default="${ant.project.name}"/>
+        <attribute name="ngwrite" default="${ngwrite}"/>
+        <attribute name="ngrun" default="${ngrun}"/>
         <attribute name="libpath" default=","/>
         <attribute name="debug" default="true"/>
         <element name="xargs" implicit="true" optional="true"/>
 
         <sequential>
-            <requireflex version="4"/>
-            <if><equals arg1="${useng}" arg2="true"/><then>
-                    <echo file="dist/ng">
-ng flex2.tools.Compc \
-  +flexlib=${flexsdk.dir}/frameworks \
-  -compiler.external-library-path+=@{libpath} \
-  -compiler.source-path=@{srcdir} \
-  -compiler.debug=@{debug} \
-  -compiler.accessible=false \
-  -compiler.omit-trace-statements=false \
-  -include-sources=@{srcdir} \
-  -output=@{dest}
-                    </echo>
-                    </then><else>
-                    <java jar="${flexsdk.dir}/lib/compc.jar" fork="true" failonerror="true" maxmemory="1024m">
-                        <jvmarg value="-Djava.awt.headless=true"/>
-                        <xargs/>
-                        <arg value="+flexlib=${flexsdk.dir}/frameworks"/>
-                        <arg value="-compiler.external-library-path+=@{libpath}"/>
-                        <arg value="-compiler.source-path=@{srcdir}"/>
-                        <arg value="-compiler.debug=@{debug}"/>
-                        <arg value="-compiler.accessible=false"/>
-                        <arg value="-compiler.omit-trace-statements=false"/>
-                        <arg value="-include-sources=@{srcdir}"/>
-                        <arg value="-output=@{dest}"/>
-                    </java>
-            </else></if>
+          <requireflex version="4"/>
+          <javanailgun ngdest="dist/@{id}.ng.sh" ngwrite="@{ngwrite}" ngrun="@{ngrun}" classpath="${flexsdk.dir}/lib/compc.jar" classname="flex2.tools.Compc" failonerror="true" fork="true" maxmemory="1024m">
+            <jvmarg value="-Djava.awt.headless=true"/>
+            <xargs/>
+            <arg value="+flexlib=${flexsdk.dir}/frameworks"/>
+            <arg value="-compiler.external-library-path+=@{libpath}"/>
+            <arg value="-compiler.source-path=@{srcdir}"/>
+            <arg value="-compiler.debug=@{debug}"/>
+            <arg value="-compiler.accessible=false"/>
+            <arg value="-compiler.omit-trace-statements=false"/>
+            <arg value="-include-sources=@{srcdir}"/>
+            <arg value="-output=@{dest}"/>
+          </javanailgun>
         </sequential>
     </macrodef>
 
