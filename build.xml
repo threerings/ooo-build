@@ -3,7 +3,7 @@
   <property name="deploy.dir"  value="dist"/>
 
   <!-- bring in our standard build support -->
-  <property name="ooo-build.vers" value="2.0"/>
+  <property name="ooo-build.vers" value="2.1"/>
   <ant antfile="etc/bootstrap.xml"/>
   <import file="${user.home}/.m2/ooo-build/${ooo-build.vers}/ooo-build.xml"/>
 
