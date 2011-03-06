@@ -2,7 +2,6 @@
 <project name="build-support" xmlns:artifact="urn:maven-artifact-ant">
   <!-- import our basic macros -->
   <import file="ooo-maven-macros.xml"/>
-  <import file="ooo-as-macros.xml"/>
   <import file="ooo-java-macros.xml"/>
 
   <!-- initializes the Maven Ant tasks -->
@@ -32,14 +31,5 @@
     <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="ant-contrib.classpath"/>
   </target>
 
-  <target name="-init-javanailgun" depends="-init-maven-ant" unless="javanailgun.initted">
-    <property name="javanailgun.initted" value="true"/>
-    <artifact:dependencies pathId="javanailgun.classpath">
-      <dependency groupId="com.threerings.ant" artifactId="javanailgun" version="1.0"/>
-    </artifact:dependencies>
-    <taskdef name="javanailgun" classname="com.threerings.ant.JavaNailgunTask"
-      classpathref="javanailgun.classpath"/>
-  </target>
-
-  <target name="-init-as" depends="-init-contrib,-init-javanailgun"/>
+  <target name="-init-ooo" depends="-init-contrib"/>
 </project>

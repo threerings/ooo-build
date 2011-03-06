@@ -1,4 +1,16 @@
 <project name="ooo-maven-macros" xmlns:artifact="urn:maven-artifact-ant">
+  <macrodef name="checkpomoridset">
+    <attribute name="id"/>
+    <sequential>
+      <if>
+        <equals arg1="@{id}" arg2=""/>
+        <then>
+          <fail message="Either id or pom must be set"/>
+        </then>
+      </if>
+    </sequential>
+  </macrodef>
+
   <macrodef name="mavendep"
       description="Fetches maven dependencies for an id and caches the dependency resolution">
     <attribute name="pom" default=""/>
@@ -9,7 +21,7 @@
     <attribute name="pathProp" default=""/>
     <attribute name="pathSep" default=","/>
     <attribute name="destdir" default=""/>
-    <attribute name="scope" default="runtime"/>
+    <attribute name="scope" default="compile"/>
     <element name="dependencies-elements" implicit="true" optional="true"/>
     <sequential>
       <checkpomoridset id="@{id}"/>
@@ -104,6 +116,42 @@
             <pom file="@{pom}"/>
           </artifact:install>
         </else>
+      </if>
+    </sequential>
+  </macrodef>
+  <macrodef name="maventaskdef">
+    <attribute name="groupId"/>
+    <attribute name="artifactId"/>
+    <attribute name="version"/>
+    <attribute name="id" default="@{groupId}.@{artifactId}-@{version}-taskdef"/>
+    <attribute name="resource" default=""/>
+    <element name="dependencies-elements" implicit="true" optional="true"/>
+    <sequential>
+      <if>
+        <not><isset property="@{id}-run"/></not>
+        <then>
+          <if>
+            <equals arg1="@{resource}" arg2=""/>
+            <then>
+              <propertyregex property="resource-group-id"
+                  input="@{groupId}."
+                  regexp="([^\.]*?)\."
+                  replace="\1/"
+                  global="true"
+                  override="true"/>
+              <var name="current-resource" value="${resource-group-id}@{artifactId}/antlib.xml"/>
+            </then>
+            <else>
+              <var name="current-resource" value="@{resource}"/>
+            </else>
+          </if>
+          <mavendep id="@{id}">
+            <dependency groupId="@{groupId}" artifactId="@{artifactId}" version="@{version}"/>
+            <dependencies-elements/>
+          </mavendep>
+          <taskdef resource="${current-resource}" classpathref="@{id}.path"/>
+          <property name="@{id}-run" value="true"/>
+        </then>
       </if>
     </sequential>
   </macrodef>
