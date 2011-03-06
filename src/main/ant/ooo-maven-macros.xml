@@ -147,6 +147,7 @@
           </if>
           <mavendep id="@{id}">
             <dependency groupId="@{groupId}" artifactId="@{artifactId}" version="@{version}"/>
+            <remoteRepository id="ooo-public" url="http://ooo-maven.googlecode.com/hg/repository"/>
             <dependencies-elements/>
           </mavendep>
           <taskdef resource="${current-resource}" classpathref="@{id}.path"/>
