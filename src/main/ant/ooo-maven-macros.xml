@@ -49,7 +49,7 @@
       </if>
       <if>
         <not><equals arg1="@{pathProp}" arg2=""/></not>
-        <then><pathconvert pathsep="," property="@{pathProp}" refid="@{fileset}"/></then>
+        <then><pathconvert pathsep="@{pathSep}" property="@{pathProp}" refid="@{fileset}"/></then>
       </if>
       <if>
         <not><equals arg1="@{destDir}" arg2=""/></not>
