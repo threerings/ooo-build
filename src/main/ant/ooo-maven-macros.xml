@@ -17,6 +17,7 @@
     <attribute name="id" default="@{pom}"/>
     <attribute name="fileset" default="@{id}.fileset"/>
     <attribute name="path" default="@{id}.path"/>
+    <attribute name="cacheDependencyRefs" default="true"/>
     <attribute name="dependencyFile" default="${deploy.dir}/@{id}.dependencies"/>
     <attribute name="pathProp" default=""/>
     <attribute name="pathSep" default=","/>
@@ -35,14 +36,16 @@
         <not><equals arg1="@{pom}" arg2=""/></not>
         <then>
           <artifact:dependencies filesetId="@{fileset}" pathId="@{path}" useScope="@{scope}"
-              cacheDependencyRefs="true" dependencyRefsBuildFile="@{dependencyFile}">
+              cacheDependencyRefs="@{cacheDependencyRefs}"
+              dependencyRefsBuildFile="@{dependencyFile}">
             <pom file="@{pom}"/>
             <dependencies-elements/>
           </artifact:dependencies>
         </then>
         <else>
           <artifact:dependencies filesetId="@{fileset}" pathId="@{path}" useScope="@{scope}"
-              cacheDependencyRefs="true" dependencyRefsBuildFile="@{dependencyFile}">
+              cacheDependencyRefs="@{cacheDependencyRefs}"
+              dependencyRefsBuildFile="@{dependencyFile}">
             <dependencies-elements/>
           </artifact:dependencies>
         </else>
@@ -125,6 +128,7 @@
     <attribute name="version"/>
     <attribute name="id" default="@{groupId}.@{artifactId}-@{version}-taskdef"/>
     <attribute name="resource" default=""/>
+    <attribute name="cacheDependencyRefs" default="true"/>
     <element name="dependencies-elements" implicit="true" optional="true"/>
     <sequential>
       <if>
@@ -145,7 +149,7 @@
               <var name="current-resource" value="@{resource}"/>
             </else>
           </if>
-          <mavendep id="@{id}">
+          <mavendep id="@{id}" cacheDependencyRefs="@{cacheDependencyRefs}">
             <dependency groupId="@{groupId}" artifactId="@{artifactId}" version="@{version}"/>
             <remoteRepository id="ooo-public" url="http://ooo-maven.googlecode.com/hg/repository"/>
             <dependencies-elements/>
