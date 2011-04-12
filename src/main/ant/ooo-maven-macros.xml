@@ -27,27 +27,49 @@
     <sequential>
       <checkpomoridset id="@{id}"/>
       <if>
-        <matches string="@{dependencyFile}" pattern="^\$\{"/>
+        <and>
+          <equals arg1="cacheDependencyRefs" arg2="true"/>
+          <matches string="@{dependencyFile}" pattern="^\$\{"/>
+        </and>
         <then>
           <fail message="dependencyFile must be set on mavendep if ${deploy.dir} isn't set"/>
         </then>
       </if>
       <if>
-        <not><equals arg1="@{pom}" arg2=""/></not>
+        <equals arg1="@{cacheDependencyRefs}" arg2="true"/>
         <then>
-          <artifact:dependencies filesetId="@{fileset}" pathId="@{path}" useScope="@{scope}"
-              cacheDependencyRefs="@{cacheDependencyRefs}"
-              dependencyRefsBuildFile="@{dependencyFile}">
-            <pom file="@{pom}"/>
-            <dependencies-elements/>
-          </artifact:dependencies>
+          <if>
+            <not><equals arg1="@{pom}" arg2=""/></not>
+            <then>
+              <artifact:dependencies filesetId="@{fileset}" pathId="@{path}" useScope="@{scope}"
+                dependencyRefsBuildFile="@{dependencyFile}">
+                <pom file="@{pom}"/>
+                <dependencies-elements/>
+              </artifact:dependencies>
+            </then>
+            <else>
+              <artifact:dependencies filesetId="@{fileset}" pathId="@{path}" useScope="@{scope}"
+                dependencyRefsBuildFile="@{dependencyFile}">
+                <dependencies-elements/>
+              </artifact:dependencies>
+            </else>
+          </if>
         </then>
         <else>
-          <artifact:dependencies filesetId="@{fileset}" pathId="@{path}" useScope="@{scope}"
-              cacheDependencyRefs="@{cacheDependencyRefs}"
-              dependencyRefsBuildFile="@{dependencyFile}">
-            <dependencies-elements/>
-          </artifact:dependencies>
+          <if>
+            <not><equals arg1="@{pom}" arg2=""/></not>
+            <then>
+              <artifact:dependencies filesetId="@{fileset}" pathId="@{path}" useScope="@{scope}">
+                <pom file="@{pom}"/>
+                <dependencies-elements/>
+              </artifact:dependencies>
+            </then>
+            <else>
+              <artifact:dependencies filesetId="@{fileset}" pathId="@{path}" useScope="@{scope}">
+                <dependencies-elements/>
+              </artifact:dependencies>
+            </else>
+          </if>
         </else>
       </if>
       <if>
