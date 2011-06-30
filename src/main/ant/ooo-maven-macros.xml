@@ -18,7 +18,7 @@
     <attribute name="fileset" default="@{id}.fileset"/>
     <attribute name="path" default="@{id}.path"/>
     <attribute name="cacheDependencyRefs" default="true"/>
-    <attribute name="dependencyFile" default="${deploy.dir}/@{id}.dependencies"/>
+    <attribute name="dependencyFile" default=""/>
     <attribute name="pathProp" default=""/>
     <attribute name="pathSep" default=","/>
     <attribute name="destdir" default=""/>
@@ -27,12 +27,29 @@
     <sequential>
       <checkpomoridset id="@{id}"/>
       <if>
-        <and>
-          <equals arg1="cacheDependencyRefs" arg2="true"/>
-          <matches string="@{dependencyFile}" pattern="^\$\{"/>
-        </and>
+        <equals arg1="@{cacheDependencyRefs}" arg2="true"/>
         <then>
-          <fail message="dependencyFile must be set on mavendep if ${deploy.dir} isn't set"/>
+          <if>
+            <not><equals arg1="@{dependencyFile}" arg2=""/></not>
+            <then>
+              <var name="derivedDependencyFile" value="@{dependencyFile}"/>
+            </then>
+            <elseif>
+              <not><matches string="${target.dir}" pattern="^\$\{"/></not>
+              <then>
+                <var name="derivedDependencyFile" value="${target.dir}/@{id}.dependencies"/>
+              </then>
+            </elseif>
+            <elseif>
+              <not><matches string="${deploy.dir}" pattern="^\$\{"/></not>
+              <then>
+                <var name="derivedDependencyFile" value="${deploy.dir}/@{id}.dependencies"/>
+              </then>
+            </elseif>
+            <else>
+              <fail message="dependencyFile must be set on mavendep if ${deploy.dir} or ${target.dir} isn't set"/>
+            </else>
+          </if>
         </then>
       </if>
       <if>
@@ -42,14 +59,14 @@
             <not><equals arg1="@{pom}" arg2=""/></not>
             <then>
               <artifact:dependencies filesetId="@{fileset}" pathId="@{path}" useScope="@{scope}"
-                dependencyRefsBuildFile="@{dependencyFile}">
+                cacheDependencyRefs="true" dependencyRefsBuildFile="${derivedDependencyFile}">
                 <pom file="@{pom}"/>
                 <dependencies-elements/>
               </artifact:dependencies>
             </then>
             <else>
               <artifact:dependencies filesetId="@{fileset}" pathId="@{path}" useScope="@{scope}"
-                dependencyRefsBuildFile="@{dependencyFile}">
+                cacheDependencyRefs="true" dependencyRefsBuildFile="${derivedDependencyFile}">
                 <dependencies-elements/>
               </artifact:dependencies>
             </else>
