@@ -66,7 +66,7 @@ Deploys a file to a Maven repository. If the `maven.deploy.repo` property is set
 
 maventaskdef
 ------------
-Fetches a Maven artifact and load tasks from it e.g. `<maventaskdef groupId="com.threerings.ant" artifactId="javanailgun" version="1.0"/>` loads the [javanailgun task](http://code.google.com/p/ant-javanailgun/). The macro checks if the task has already been loaded before running, so it's safe to specify the same task in multiple places.
+Fetches a Maven artifact and load tasks from it e.g. `<maventaskdef groupId="com.threerings.ant" artifactId="javanailgun" version="1.0"/>` loads the [javanailgun task](https://github.com/threerings/ant-javanailgun). The macro checks if the task has already been loaded before running, so it's safe to specify the same task in multiple places.
 
 **All Attributes**
 
