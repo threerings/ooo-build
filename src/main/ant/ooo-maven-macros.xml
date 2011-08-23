@@ -193,7 +193,8 @@
             <remoteRepository id="ooo-public" url="http://ooo-maven.googlecode.com/hg/repository"/>
             <dependencies-elements/>
           </mavendep>
-          <taskdef resource="${current-resource}" classpathref="@{id}.path"/>
+          <taskdef resource="${current-resource}" classpathref="@{id}.path"
+            loaderref="@{id}.loader"/>
           <property name="@{id}-run" value="true"/>
         </then>
       </if>

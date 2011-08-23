@@ -75,4 +75,8 @@ Fetches a Maven artifact and load tasks from it e.g. `<maventaskdef groupId="com
 * _version_ - The version of the jar containing the tasks.
 * _resource_ - The resource to be passed to the [taskdef](http://ant.apache.org/manual/Tasks/typedef.html) task. By default, this is `antlib.xml` in the path to the `groupId` and `artifactId` eg `com/threerings/ant/javanailgun/antlib.xml` for the initial example.
 * _cacheDependencyRefs_ - If the dependencies should be cached. Defaults to true. *Added in 2.3*
+* _id_ - The base name of the created classpath and loader. Defaults to
+  `groupId`.`artifactId`-`version`-taskdef. The classpath is accessible as `id`.path and the loader
+  is accessible as `id`.loader for use in classpathref and loaderref in additional
+  [typedefs](http://ant.apache.org/manual/Tasks/typedef.html) using this task.
 
