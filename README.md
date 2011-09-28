@@ -2,13 +2,13 @@ ooo-build provides Ant xml to bootstrap a vanilla Ant installation with Maven su
 
 Getting Started
 ================
-To use ooo-build, copy [http://ooo-build.googlecode.com/hg/etc/bootstrap.xml bootstrap.xml] into your project alongside the build.xml for Ant. Then import the bootstrap code at the top of your build.xml with the following:
+To use ooo-build, copy [bootstrap.xml](https://raw.github.com/threerings/ooo-build/master/etc/bootstrap.xml) into your project alongside the build.xml for Ant. Then import the bootstrap code at the top of your build.xml with the following:
 
-    <property name="ooo-build.vers" value="2.1"/>
+    <property name="ooo-build.vers" value="2.7"/>
     <ant antfile="bootstrap.xml"/>
     <import file="${user.home}/.m2/ooo-build/${ooo-build.vers}/ooo-build.xml"/>
 
-Once it's imported, add a dependency on `-init-ooo` to your lowest common denominator targets, and it's ready to use. Running that target makes the Maven Ant tasks available, loads [http://ant-contrib.sourceforge.net/ ant-contrib], and sets up ooo-build's Maven macros.
+Once it's imported, add a dependency on `-init-ooo` to your lowest common denominator targets, and it's ready to use. Running that target makes the Maven Ant tasks available, loads [ant-contrib](http://ant-contrib.sourceforge.net/ ), and sets up ooo-build's Maven macros.
 
 Upgrading
 =========
