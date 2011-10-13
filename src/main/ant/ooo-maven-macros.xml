@@ -127,40 +127,45 @@
     <attribute name="pom"/>
     <attribute name="file"/>
     <attribute name="srcdir" default=""/>
+    <attribute name="docdir" default=""/>
     <sequential>
-      <if>
-        <isset property="maven.deploy.repo"/>
-        <then>
-          <!-- We've got a loc, so we need to deploy. If srcdir is set, jar up the source and
-            include it in the deployment. Otherwise just deploy the artifact. -->
-          <if>
-            <not><equals arg1="@{srcdir}" arg2=""/></not>
-            <then>
-              <tempfile property="@{srcdir}.jar" prefix="source" suffix=".jar" deleteonexit="true"/>
-              <jar basedir="@{srcdir}" destfile="${@{srcdir}.jar}"/>
-              <artifact:deploy file="@{file}" uniqueVersion="false">
-                <remoteRepository url="${maven.deploy.repo}"/>
-                <pom file="@{pom}"/>
-                <attach file="${@{srcdir}.jar}" classifier="sources"/>
-              </artifact:deploy>
-            </then>
-            <else>
-              <artifact:deploy file="@{file}" uniqueVersion="false">
-                <remoteRepository url="${maven.deploy.repo}"/>
-                <pom file="@{pom}"/>
-              </artifact:deploy>
-            </else>
-          </if>
-        </then>
-        <else>
-          <!-- No loc specified, so install it in the local repo and don't worry about source -->
+      <if><equals arg1="@{srcdir}" arg2=""/><then>
+        <if><isset property="maven.deploy.repo"/><then>
+          <!-- We've got a loc, so we need to deploy. -->
+          <artifact:deploy file="@{file}" uniqueVersion="false">
+            <remoteRepository url="${maven.deploy.repo}"/>
+            <pom file="@{pom}"/>
+          </artifact:deploy>
+        </then><else>
           <artifact:install file="@{file}">
             <pom file="@{pom}"/>
           </artifact:install>
-        </else>
-      </if>
+        </else></if>
+      </then><else>
+        <!-- create our sources and javadoc jars -->
+        <tempfile property="@{srcdir}.jar" prefix="sources" suffix=".jar" deleteonexit="true"/>
+        <tempfile property="@{docdir}.jar" prefix="javadoc" suffix=".jar" deleteonexit="true"/>
+        <jar basedir="@{srcdir}" destfile="${@{srcdir}.jar}"/>
+        <jar basedir="@{docdir}" destfile="${@{docdir}.jar}"/>
+        <if><isset property="maven.deploy.repo"/><then>
+          <!-- We've got a loc, so we need to deploy. -->
+          <artifact:deploy file="@{file}" uniqueVersion="false">
+            <remoteRepository url="${maven.deploy.repo}"/>
+            <pom file="@{pom}"/>
+            <attach file="${@{srcdir}.jar}" classifier="sources"/>
+            <attach file="${@{docdir}.jar}" classifier="javadoc"/>
+          </artifact:deploy>
+        </then><else>
+          <artifact:install file="@{file}">
+            <pom file="@{pom}"/>
+            <attach file="${@{srcdir}.jar}" classifier="sources"/>
+            <attach file="${@{docdir}.jar}" classifier="javadoc"/>
+          </artifact:install>
+        </else></if>
+      </else></if>
     </sequential>
   </macrodef>
+
   <macrodef name="maventaskdef">
     <attribute name="groupId"/>
     <attribute name="artifactId"/>
