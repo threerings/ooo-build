@@ -123,6 +123,16 @@
     </sequential>
   </macrodef>
 
+  <macrodef name="maveninstall">
+    <attribute name="pom"/>
+    <attribute name="file"/>
+    <sequential>
+      <artifact:install file="@{file}">
+        <pom file="@{pom}"/>
+      </artifact:install>
+    </sequential>
+  </macrodef>
+
   <macrodef name="mavendeploy">
     <attribute name="pom"/>
     <attribute name="file"/>
@@ -130,38 +140,24 @@
     <attribute name="docdir" default=""/>
     <sequential>
       <if><equals arg1="@{srcdir}" arg2=""/><then>
-        <if><isset property="maven.deploy.repo"/><then>
-          <!-- We've got a loc, so we need to deploy. -->
-          <artifact:deploy file="@{file}" uniqueVersion="false">
-            <remoteRepository url="${maven.deploy.repo}"/>
-            <pom file="@{pom}"/>
-          </artifact:deploy>
-        </then><else>
-          <artifact:install file="@{file}">
-            <pom file="@{pom}"/>
-          </artifact:install>
-        </else></if>
+        <!-- We've got a loc, so we need to deploy. -->
+        <artifact:deploy file="@{file}" uniqueVersion="false">
+          <remoteRepository url="${maven.deploy.repo}"/>
+          <pom file="@{pom}"/>
+        </artifact:deploy>
       </then><else>
         <!-- create our sources and javadoc jars -->
         <tempfile property="@{srcdir}.jar" prefix="sources" suffix=".jar" deleteonexit="true"/>
         <tempfile property="@{docdir}.jar" prefix="javadoc" suffix=".jar" deleteonexit="true"/>
         <jar basedir="@{srcdir}" destfile="${@{srcdir}.jar}"/>
         <jar basedir="@{docdir}" destfile="${@{docdir}.jar}"/>
-        <if><isset property="maven.deploy.repo"/><then>
-          <!-- We've got a loc, so we need to deploy. -->
-          <artifact:deploy file="@{file}" uniqueVersion="false">
-            <remoteRepository url="${maven.deploy.repo}"/>
-            <pom file="@{pom}"/>
-            <attach file="${@{srcdir}.jar}" classifier="sources"/>
-            <attach file="${@{docdir}.jar}" classifier="javadoc"/>
-          </artifact:deploy>
-        </then><else>
-          <artifact:install file="@{file}">
-            <pom file="@{pom}"/>
-            <attach file="${@{srcdir}.jar}" classifier="sources"/>
-            <attach file="${@{docdir}.jar}" classifier="javadoc"/>
-          </artifact:install>
-        </else></if>
+        <!-- We've got a loc, so we need to deploy. -->
+        <artifact:deploy file="@{file}" uniqueVersion="false">
+          <remoteRepository url="${maven.deploy.repo}"/>
+          <pom file="@{pom}"/>
+          <attach file="${@{srcdir}.jar}" classifier="sources"/>
+          <attach file="${@{docdir}.jar}" classifier="javadoc"/>
+        </artifact:deploy>
       </else></if>
     </sequential>
   </macrodef>
