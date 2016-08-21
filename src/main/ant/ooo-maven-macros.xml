@@ -191,7 +191,7 @@
           </if>
           <mavendep id="@{id}" cacheDependencyRefs="@{cacheDependencyRefs}">
             <dependency groupId="@{groupId}" artifactId="@{artifactId}" version="@{version}"/>
-            <remoteRepository id="ooo-public" url="http://ooo-maven.googlecode.com/hg/repository"/>
+            <remoteRepository id="ooo-public" url="https://raw.githubusercontent.com/threerings/maven-repo/master/repository"/>
             <dependencies-elements/>
           </mavendep>
           <taskdef resource="${current-resource}" classpathref="@{id}.path"
