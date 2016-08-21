@@ -4,7 +4,7 @@ Getting Started
 ================
 To use ooo-build, copy [bootstrap.xml](https://raw.github.com/threerings/ooo-build/master/etc/bootstrap.xml) into your project alongside the build.xml for Ant. Then import the bootstrap code at the top of your build.xml with the following:
 
-    <property name="ooo-build.vers" value="2.7"/>
+    <property name="ooo-build.vers" value="2.10"/>
     <ant antfile="bootstrap.xml"/>
     <import file="${user.home}/.m2/ooo-build/${ooo-build.vers}/ooo-build.xml"/>
 
