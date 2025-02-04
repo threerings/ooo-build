@@ -3,7 +3,7 @@
     <attribute name="srcdir"/>
     <attribute name="destdir"/>
     <attribute name="classpathref"/>
-    <attribute name="version" default="1.6"/>
+    <attribute name="version" default="10"/>
     <element name="javac-elements" implicit="true" optional="true"/>
     <sequential>
       <javac srcdir="@{srcdir}" destdir="@{destdir}" includeAntRuntime="no" encoding="utf-8"
